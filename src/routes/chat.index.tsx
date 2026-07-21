@@ -22,7 +22,7 @@ const suggestions = [
     icon: ImageIcon,
     label: "Generate a hero image",
     prompt:
-      "Generate a cinematic hero image concept for a premium AI assistant dashboard.",
+      "Generate an image of a cinematic hero shot for a premium AI assistant dashboard.",
   },
   {
     icon: LineChart,
@@ -115,4 +115,3 @@ export function ChatHome() {
     </main>
   );
 }
-

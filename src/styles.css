@@ -453,7 +453,7 @@ h1 span {
   background: rgba(30, 58, 56, 0.72);
 }
 
-.message-bubble span {
+.message-bubble .message-speaker {
   display: block;
   margin-bottom: 6px;
   color: var(--gold);
@@ -465,6 +465,44 @@ h1 span {
 .message-bubble p {
   margin: 0;
   white-space: pre-wrap;
+}
+
+.generated-image {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.generated-image img {
+  display: block;
+  width: min(100%, 520px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(244, 201, 93, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  object-fit: contain;
+}
+
+.generated-image figcaption {
+  display: grid;
+  gap: 3px;
+  color: #d8cdbd;
+  font-size: 13px;
+}
+
+.generated-image figcaption strong {
+  color: var(--gold);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.generated-image figcaption small {
+  color: var(--cyan);
+  font-size: 12px;
+}
+
+.generated-image figcaption p {
+  color: var(--muted);
 }
 
 .thinking p {

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowUp, CircleAlert, Plus, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ChatProvider, sendChatMessage } from "@/lib/api";
+import { ChatProvider, sendChatMessage, sendImagePrompt } from "@/lib/api";
 import {
   appendMessage,
   createThread,
@@ -15,7 +15,7 @@ import {
 const providerStorageKey = "barry.chatProvider.v1";
 const providerOptions: Array<{ label: string; value: ChatProvider }> = [
   { label: "OpenAI / ChatGPT", value: "openai" },
-  { label: "DeepSeek", value: "deepseek" },
+  { label: "DeepSeek (chat only)", value: "deepseek" },
   { label: "Gemini", value: "gemini" },
 ];
 
@@ -25,6 +25,9 @@ export function ChatThread() {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
   const [provider, setProvider] = useState<ChatProvider>(readStoredProvider);
+  const [pendingMode, setPendingMode] = useState<"chat" | "image" | null>(
+    null
+  );
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const autoRunRef = useRef<string | null>(null);
 
@@ -48,11 +51,30 @@ export function ChatThread() {
       content: string;
       storeUserMessage?: boolean;
     }) => {
+      const shouldGenerateImage = isImagePrompt(content);
+
       if (storeUserMessage) {
         appendMessage(threadId, { role: "user", content });
         updateThreadTitleFromMessages(threadId);
         await queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
         await queryClient.invalidateQueries({ queryKey: ["threads"] });
+      }
+
+      if (shouldGenerateImage) {
+        const image = await sendImagePrompt({
+          prompt: content,
+          provider,
+          threadId,
+        });
+
+        appendMessage(threadId, {
+          role: "assistant",
+          content: `Generated image for: ${content}`,
+          contentType: "image",
+          image,
+        });
+        updateThreadTitleFromMessages(threadId);
+        return;
       }
 
       const refreshedThread = getThread(threadId);
@@ -67,10 +89,16 @@ export function ChatThread() {
       });
       updateThreadTitleFromMessages(threadId);
     },
+    onMutate: ({ content }) => {
+      setPendingMode(isImagePrompt(content) ? "image" : "chat");
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
       await queryClient.invalidateQueries({ queryKey: ["threads"] });
       inputRef.current?.focus();
+    },
+    onSettled: () => {
+      setPendingMode(null);
     },
   });
   const chatErrorMessage =
@@ -196,8 +224,27 @@ export function ChatThread() {
               className={`message-row message-${message.role}`}
             >
               <div className="message-bubble">
-                <span>{message.role === "assistant" ? "Barry" : "You"}</span>
-                <p>{message.content}</p>
+                <span className="message-speaker">
+                  {message.role === "assistant" ? "Barry" : "You"}
+                </span>
+                {message.contentType === "image" && message.image ? (
+                  <figure className="generated-image">
+                    <img
+                      src={getImageSource(message.image)}
+                      alt={message.image.prompt}
+                    />
+                    <figcaption>
+                      <strong>
+                        Generated with{" "}
+                        {getProviderLabel(message.image.providerUsed)}
+                      </strong>
+                      <small>{message.image.modelUsed}</small>
+                      <p>{message.image.prompt}</p>
+                    </figcaption>
+                  </figure>
+                ) : (
+                  <p>{message.content}</p>
+                )}
               </div>
             </article>
           ))
@@ -206,8 +253,12 @@ export function ChatThread() {
         {sendMutation.isPending ? (
           <article className="message-row message-assistant">
             <div className="message-bubble thinking">
-              <span>Barry</span>
-              <p>Thinking fast, checking the details...</p>
+              <span className="message-speaker">Barry</span>
+              <p>
+                {pendingMode === "image"
+                  ? `Generating image with ${getProviderLabel(provider)}...`
+                  : "Thinking fast, checking the details..."}
+              </p>
             </div>
           </article>
         ) : null}
@@ -263,4 +314,27 @@ function sendMutationErrorMessage(error: unknown) {
   if (!error) return null;
   if (error instanceof Error && error.message.trim()) return error.message;
   return String(error);
+}
+
+function isImagePrompt(content: string) {
+  const normalized = content.trim().toLowerCase();
+
+  return [
+    /\b(generate|create|make|draw|render|design|produce)\b.*\b(image|picture|photo|illustration|graphic|poster|logo|visual|art)\b/,
+    /\bhero image\b/,
+  ].some((pattern) => pattern.test(normalized));
+}
+
+function getImageSource(image: {
+  imageUrl?: string;
+  imageBase64?: string;
+  mimeType: string;
+}) {
+  if (image.imageUrl) return image.imageUrl;
+  return `data:${image.mimeType};base64,${image.imageBase64 ?? ""}`;
+}
+
+function getProviderLabel(provider: ChatProvider) {
+  if (provider === "gemini") return "Gemini";
+  return provider === "deepseek" ? "DeepSeek" : "OpenAI / ChatGPT";
 }

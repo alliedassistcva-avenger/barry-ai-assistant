@@ -10,7 +10,7 @@ integration, and evaluation artifacts needed to configure Barry elsewhere.
 - [src/routes/index.tsx](src/routes/index.tsx): redirects `/` to `/chat`.
 - [src/routes/chat.index.tsx](src/routes/chat.index.tsx): adapted chat home from the uploaded route.
 - [src/routes/chat.thread.tsx](src/routes/chat.thread.tsx): conversation view, composer, and starter-prompt execution.
-- [server/index.ts](server/index.ts): local API server for Barry chat responses.
+- [server/index.ts](server/index.ts): local API server for Barry chat and image responses.
 - [src/assets/barry-logo.png](src/assets/barry-logo.png): generated app logo used by the chat UI.
 
 ## Prompt And Configuration
@@ -58,12 +58,15 @@ Set these Railway variables:
 
 - `OPENAI_API_KEY`: required for OpenAI / ChatGPT responses.
 - `OPENAI_MODEL`: optional, defaults to `gpt-4.1`.
+- `OPENAI_IMAGE_MODEL`: optional, defaults to `gpt-image-2`.
 - `DEEPSEEK_API_KEY`: required for DeepSeek responses.
 - `DEEPSEEK_BASE_URL`: optional, defaults to `https://api.deepseek.com`.
 - `DEEPSEEK_MODEL`: optional, defaults to `deepseek-v4-pro`.
 - `GEMINI_API_KEY`: required for Gemini responses.
 - `GEMINI_BASE_URL`: optional, defaults to `https://generativelanguage.googleapis.com/v1beta/openai/`.
 - `GEMINI_MODEL`: optional, defaults to `gemini-3.5-flash`.
+- `GEMINI_IMAGE_BASE_URL`: optional, defaults to `https://generativelanguage.googleapis.com/v1beta`.
+- `GEMINI_IMAGE_MODEL`: optional, defaults to `gemini-3.1-flash-image`.
 - `AI_PROVIDER`: optional default for server-side requests, `openai`, `deepseek`, or `gemini`.
 
 Do not set `HOST=127.0.0.1` in Railway. If you define `HOST`, use `0.0.0.0`.
@@ -90,6 +93,7 @@ The local server exposes:
 
 - `GET /api/health`: returns server mode and configured model.
 - `POST /api/chat`: accepts `{ "messages": [...] }` and returns a Barry response.
+- `POST /api/image`: accepts `{ "prompt": "...", "provider": "openai|gemini|deepseek", "threadId": "..." }` and returns generated image data plus the provider/model used.
 
 The server reads Barry's instructions directly from `prompts/barry-system.prompt.xml`.
 This keeps the web app and workspace-agent prompt aligned.
@@ -105,7 +109,13 @@ response.
 The chat header includes an AI provider dropdown. Choose `OpenAI / ChatGPT` to
 use OpenAI's Responses API, `DeepSeek` to use DeepSeek's OpenAI-compatible Chat
 Completions API, or `Gemini` to use Gemini's OpenAI-compatible Chat Completions
-API.
+API. Image prompts use the same selected provider: OpenAI uses `gpt-image-2`,
+Gemini uses `gemini-3.1-flash-image`, and DeepSeek is marked chat-only because
+its public API does not currently expose image generation.
+
+Image messages are stored in the same browser `localStorage` thread records as
+text messages, including the generated image payload, original prompt,
+provider, and model. They reload inline when the thread is reopened.
 
 ## Consequential Actions
 

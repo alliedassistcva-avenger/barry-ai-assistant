@@ -1,8 +1,8 @@
-import { ChatMessage } from "@/lib/types";
+import { ChatImagePayload, ChatMessage, ChatProvider } from "@/lib/types";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
-export type ChatProvider = "openai" | "deepseek" | "gemini";
+export type { ChatProvider } from "@/lib/types";
 
 export interface ChatRequest {
   messages: ChatMessage[];
@@ -14,6 +14,16 @@ export interface ChatResponse {
   mode: "live";
   model: string;
   provider: ChatProvider;
+}
+
+export interface ImageRequest {
+  prompt: string;
+  provider: ChatProvider;
+  threadId?: string;
+}
+
+export interface ImageResponse extends ChatImagePayload {
+  mode: "live";
 }
 
 interface ChatErrorResponse {
@@ -74,6 +84,57 @@ export async function sendChatMessage(payload: ChatRequest) {
           );
 
     console.error("Barry chat request failed", chatError);
+    throw chatError;
+  }
+}
+
+export async function sendImagePrompt(payload: ImageRequest) {
+  try {
+    const response = await fetch(`${apiBase}/image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw await createChatApiError(response);
+    }
+
+    const data = (await response.json()) as Partial<ImageResponse>;
+    if (!data.imageUrl && !data.imageBase64) {
+      throw new ChatApiError(
+        "Barry image API returned a 200 response without an image.",
+        { details: data }
+      );
+    }
+
+    if (
+      typeof data.mimeType !== "string" ||
+      typeof data.prompt !== "string" ||
+      typeof data.providerUsed !== "string" ||
+      typeof data.modelUsed !== "string"
+    ) {
+      throw new ChatApiError(
+        "Barry image API returned a malformed image response.",
+        { details: data }
+      );
+    }
+
+    return data as ImageResponse;
+  } catch (error) {
+    const chatError =
+      error instanceof ChatApiError
+        ? error
+        : new ChatApiError(
+            error instanceof Error
+              ? `Barry image API request failed before a response was received: ${error.message}`
+              : "Barry image API request failed before a response was received.",
+            { details: error }
+          );
+
+    console.error("Barry image request failed", chatError);
     throw chatError;
   }
 }

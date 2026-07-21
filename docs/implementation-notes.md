@@ -11,10 +11,12 @@
 
 - Frontend: Vite + React + TanStack Router.
 - Server: Express + OpenAI Responses API.
-- Provider switcher: chat requests include `provider`, allowing `openai`, `deepseek`, or `gemini`.
-- Thread storage: browser `localStorage`, which keeps the app usable without adding a database.
+- Provider switcher: chat and image requests include `provider`, allowing `openai`, `deepseek`, or `gemini`.
+- Image generation: `/api/image` follows the same provider-selection pattern as `/api/chat`. OpenAI uses `OPENAI_IMAGE_MODEL` (`gpt-image-2` by default), Gemini uses `GEMINI_IMAGE_MODEL` (`gemini-3.1-flash-image` by default) through the current Gemini `interactions` API, and DeepSeek is explicitly unavailable for images because its public API does not expose image generation.
+- Thread storage: browser `localStorage`, which keeps the app usable without adding a database. Text and image assistant messages are persisted in the same thread records.
 - Live AI mode: set `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, or any combination of them in `.env`.
-- Missing key behavior: if the selected provider key is empty, `/api/chat` returns a clear `503` configuration error.
+- Missing key behavior: if the selected provider key is empty, `/api/chat` or `/api/image` returns a clear `503` configuration error.
+- No fallback behavior: Barry never silently switches providers. If the selected image provider fails, the API returns the specific provider error and the UI displays it.
 - Deployment binding: the Express server reads `PORT` and binds to `HOST` or `0.0.0.0`, so Railway and similar platforms can route external traffic to it.
 
 ## Extensibility Pattern For New Integrations

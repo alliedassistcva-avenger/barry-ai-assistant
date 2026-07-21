@@ -62,7 +62,8 @@ export async function createThread(starterPrompt?: string) {
 
 export function appendMessage(
   threadId: string,
-  message: Pick<ChatMessage, "role" | "content">
+  message: Pick<ChatMessage, "role" | "content"> &
+    Partial<Pick<ChatMessage, "contentType" | "image">>
 ) {
   const threads = readThreads();
   const timestamp = now();
@@ -105,4 +106,3 @@ export function updateThreadTitleFromMessages(threadId: string) {
 export function deleteThread(threadId: string) {
   writeThreads(readThreads().filter((thread) => thread.id !== threadId));
 }
-
