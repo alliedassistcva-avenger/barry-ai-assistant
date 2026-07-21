@@ -43,6 +43,7 @@ const geminiBaseUrl =
 const geminiImageBaseUrl =
   process.env.GEMINI_IMAGE_BASE_URL ??
   "https://generativelanguage.googleapis.com/v1beta";
+const geminiImageMimeType = "image/jpeg";
 const openaiClient = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
@@ -386,7 +387,7 @@ async function generateGeminiImage(prompt: string): Promise<GeneratedImage> {
       input: prompt,
       response_format: {
         type: "image",
-        mime_type: "image/png",
+        mime_type: geminiImageMimeType,
         aspect_ratio: "1:1",
         image_size: "1K",
       },
@@ -584,7 +585,7 @@ function extractImageBlock(value: unknown) {
         ? block.mime_type
         : typeof block.mimeType === "string"
           ? block.mimeType
-          : "image/png",
+          : geminiImageMimeType,
   };
 }
 
