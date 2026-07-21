@@ -35,7 +35,7 @@ For local development:
 1. Install Node.js 22 or newer.
 2. Run `npm install`.
 3. Copy `.env.example` to `.env`.
-4. Set `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`, or both in `.env`.
+4. Set `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, or any combination of them in `.env`.
 5. Run `npm run dev`.
 6. Open `http://127.0.0.1:5173`.
 
@@ -61,7 +61,10 @@ Set these Railway variables:
 - `DEEPSEEK_API_KEY`: required for DeepSeek responses.
 - `DEEPSEEK_BASE_URL`: optional, defaults to `https://api.deepseek.com`.
 - `DEEPSEEK_MODEL`: optional, defaults to `deepseek-v4-pro`.
-- `AI_PROVIDER`: optional default for server-side requests, `openai` or `deepseek`.
+- `GEMINI_API_KEY`: required for Gemini responses.
+- `GEMINI_BASE_URL`: optional, defaults to `https://generativelanguage.googleapis.com/v1beta/openai/`.
+- `GEMINI_MODEL`: optional, defaults to `gemini-3.5-flash`.
+- `AI_PROVIDER`: optional default for server-side requests, `openai`, `deepseek`, or `gemini`.
 
 Do not set `HOST=127.0.0.1` in Railway. If you define `HOST`, use `0.0.0.0`.
 
@@ -93,13 +96,16 @@ This keeps the web app and workspace-agent prompt aligned.
 If `OPENAI_API_KEY` is missing, `/api/chat` returns a `503` JSON error with
 `code: "missing_openai_api_key"`. If `DEEPSEEK_API_KEY` is missing while the
 DeepSeek provider is selected, `/api/chat` returns `code:
-"missing_deepseek_api_key"`. If a provider request fails, the API returns the
-actual HTTP status when available and the chat UI displays that diagnostic
-instead of saving a fake assistant response.
+"missing_deepseek_api_key"`. If `GEMINI_API_KEY` is missing while the Gemini
+provider is selected, `/api/chat` returns `code: "missing_gemini_api_key"`. If
+a provider request fails, the API returns the actual HTTP status when available
+and the chat UI displays that diagnostic instead of saving a fake assistant
+response.
 
 The chat header includes an AI provider dropdown. Choose `OpenAI / ChatGPT` to
-use OpenAI's Responses API, or `DeepSeek` to use DeepSeek's OpenAI-compatible
-Chat Completions API.
+use OpenAI's Responses API, `DeepSeek` to use DeepSeek's OpenAI-compatible Chat
+Completions API, or `Gemini` to use Gemini's OpenAI-compatible Chat Completions
+API.
 
 ## Consequential Actions
 

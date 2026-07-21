@@ -11,9 +11,9 @@
 
 - Frontend: Vite + React + TanStack Router.
 - Server: Express + OpenAI Responses API.
-- Provider switcher: chat requests include `provider`, allowing `openai` or `deepseek`.
+- Provider switcher: chat requests include `provider`, allowing `openai`, `deepseek`, or `gemini`.
 - Thread storage: browser `localStorage`, which keeps the app usable without adding a database.
-- Live AI mode: set `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`, or both in `.env`.
+- Live AI mode: set `OPENAI_API_KEY`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, or any combination of them in `.env`.
 - Missing key behavior: if the selected provider key is empty, `/api/chat` returns a clear `503` configuration error.
 - Deployment binding: the Express server reads `PORT` and binds to `HOST` or `0.0.0.0`, so Railway and similar platforms can route external traffic to it.
 

@@ -16,6 +16,7 @@ const providerStorageKey = "barry.chatProvider.v1";
 const providerOptions: Array<{ label: string; value: ChatProvider }> = [
   { label: "OpenAI / ChatGPT", value: "openai" },
   { label: "DeepSeek", value: "deepseek" },
+  { label: "Gemini", value: "gemini" },
 ];
 
 export function ChatThread() {
@@ -252,8 +253,9 @@ export function ChatThread() {
 
 function readStoredProvider(): ChatProvider {
   if (typeof window === "undefined") return "openai";
-  return window.localStorage.getItem(providerStorageKey) === "deepseek"
-    ? "deepseek"
+  const storedProvider = window.localStorage.getItem(providerStorageKey);
+  return storedProvider === "deepseek" || storedProvider === "gemini"
+    ? storedProvider
     : "openai";
 }
 

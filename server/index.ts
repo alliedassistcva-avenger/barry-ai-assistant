@@ -14,7 +14,7 @@ type IncomingMessage = {
   content: string;
 };
 
-type ChatProvider = "openai" | "deepseek";
+type ChatProvider = "openai" | "deepseek" | "gemini";
 
 const app = express();
 const port = Number(process.env.PORT ?? 8787);
@@ -23,6 +23,10 @@ const defaultProvider = normalizeProvider(process.env.AI_PROVIDER);
 const openaiModel = process.env.OPENAI_MODEL ?? "gpt-4.1";
 const deepseekModel = process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro";
 const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com";
+const geminiModel = process.env.GEMINI_MODEL ?? "gemini-3.5-flash";
+const geminiBaseUrl =
+  process.env.GEMINI_BASE_URL ??
+  "https://generativelanguage.googleapis.com/v1beta/openai/";
 const openaiClient = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
@@ -30,6 +34,12 @@ const deepseekClient = process.env.DEEPSEEK_API_KEY
   ? new OpenAI({
       apiKey: process.env.DEEPSEEK_API_KEY,
       baseURL: deepseekBaseUrl,
+    })
+  : null;
+const geminiClient = process.env.GEMINI_API_KEY
+  ? new OpenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      baseURL: geminiBaseUrl,
     })
   : null;
 
@@ -67,6 +77,10 @@ app.get("/api/health", (_request, response) => {
         configured: Boolean(deepseekClient),
         model: deepseekModel,
       },
+      gemini: {
+        configured: Boolean(geminiClient),
+        model: geminiModel,
+      },
     },
   });
 });
@@ -101,7 +115,7 @@ app.post("/api/chat", async (request, response) => {
     const message =
       provider === "openai"
         ? await createOpenAiResponse(client, model, instructions, messages)
-        : await createDeepSeekResponse(client, model, instructions, messages);
+        : await createChatCompletionResponse(client, model, instructions, messages);
 
     response.json({
       mode: "live",
@@ -172,19 +186,27 @@ function normalizeMessages(value: unknown): IncomingMessage[] {
 }
 
 function normalizeProvider(value: unknown): ChatProvider {
-  return value === "deepseek" || value === "openai" ? value : "openai";
+  return value === "deepseek" || value === "gemini" || value === "openai"
+    ? value
+    : "openai";
 }
 
 function getProviderClient(provider: ChatProvider) {
-  return provider === "deepseek" ? deepseekClient : openaiClient;
+  if (provider === "deepseek") return deepseekClient;
+  if (provider === "gemini") return geminiClient;
+  return openaiClient;
 }
 
 function getProviderModel(provider: ChatProvider) {
-  return provider === "deepseek" ? deepseekModel : openaiModel;
+  if (provider === "deepseek") return deepseekModel;
+  if (provider === "gemini") return geminiModel;
+  return openaiModel;
 }
 
 function getProviderApiKeyName(provider: ChatProvider) {
-  return provider === "deepseek" ? "DEEPSEEK_API_KEY" : "OPENAI_API_KEY";
+  if (provider === "deepseek") return "DEEPSEEK_API_KEY";
+  if (provider === "gemini") return "GEMINI_API_KEY";
+  return "OPENAI_API_KEY";
 }
 
 async function readBarryPrompt() {
@@ -210,7 +232,7 @@ async function createOpenAiResponse(
   return extractResponsesOutputText(result);
 }
 
-async function createDeepSeekResponse(
+async function createChatCompletionResponse(
   client: OpenAI,
   model: string,
   instructions: string,
@@ -312,5 +334,6 @@ function getErrorMessage(error: unknown, provider: ChatProvider) {
 }
 
 function getProviderLabel(provider: ChatProvider) {
+  if (provider === "gemini") return "Gemini";
   return provider === "deepseek" ? "DeepSeek" : "OpenAI";
 }

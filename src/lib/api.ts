@@ -2,7 +2,7 @@ import { ChatMessage } from "@/lib/types";
 
 const apiBase = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
-export type ChatProvider = "openai" | "deepseek";
+export type ChatProvider = "openai" | "deepseek" | "gemini";
 
 export interface ChatRequest {
   messages: ChatMessage[];
