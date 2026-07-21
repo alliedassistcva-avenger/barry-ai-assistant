@@ -1,0 +1,87 @@
+{
+  "agent_id": "agt_6a47e8bee95c8191803019e685e4aa9b",
+  "name": "Barry",
+  "status": "draft",
+  "is_published": false,
+  "draft_version_id": "agtv_6a47e91850ac819185a30e9924600ab9",
+  "draft_revision": "drv_1_b4BS0udTvydzJD8eDfrCP78dymUG_o6a",
+  "created_on": "2026-07-03",
+  "publish_requires_explicit_confirmation": true,
+  "profile": {
+    "description": "Fast Codex assistant for coding, ops, ads, and content.",
+    "tagline": "Speed, precision, and senior-level execution.",
+    "category": "productivity",
+    "icon": {
+      "name": "zapp",
+      "color": "yellow"
+    }
+  },
+  "built_in_tools": {
+    "web_search": {
+      "search_context_size": "high",
+      "user_location": {
+        "country": "US",
+        "timezone": "America/New_York"
+      }
+    },
+    "image_generation": {
+      "model": "gpt-image-1.5",
+      "size": "auto",
+      "quality": "high",
+      "background": "auto"
+    }
+  },
+  "connector_apps": [
+    {
+      "name": "GitHub",
+      "connector_id": "connector_76869538009648d5b282a4bb21c3d157",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "ALL",
+      "write_actions_require_end_user_approval": true
+    },
+    {
+      "name": "ChatGPT Ads Manager",
+      "connector_id": "connector_openai_ads_manager",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "ALL",
+      "write_actions_require_end_user_approval": true
+    },
+    {
+      "name": "Google Drive",
+      "connector_id": "connector_5f3c8c41a1e54ad7a76272c89e2554fa",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "READ_ONLY"
+    },
+    {
+      "name": "BigQuery",
+      "connector_id": "connector_7c3f2c8cdbf64bb0b183ff52f527a06e",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "READ_ONLY"
+    },
+    {
+      "name": "Gmail",
+      "connector_id": "connector_2128aebfecb84f64a069897515042a44",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "READ_ONLY"
+    },
+    {
+      "name": "Slack",
+      "connector_id": "asdk_app_69a1d78e929881919bba0dbda1f6436d",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "READ_ONLY"
+    },
+    {
+      "name": "Notion",
+      "connector_id": "asdk_app_69c18c28f1188191bf5b8445c4ab0a2e",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "READ_ONLY"
+    },
+    {
+      "name": "Google Contacts",
+      "connector_id": "connector_c0f748249d6a42aea4b00fd375570ded",
+      "auth_type": "PERSONAL",
+      "enabled_actions": "READ_ONLY"
+    }
+  ]
+}
+

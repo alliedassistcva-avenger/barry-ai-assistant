@@ -1,0 +1,50 @@
+{
+  "assistant_name": "Barry",
+  "system_prompt_file": "prompts/barry-system.prompt.xml",
+  "context_injection": {
+    "include_active_repository_context": true,
+    "include_directory_structure": true,
+    "include_relevant_terminal_logs": true,
+    "integration_manifest_schema": "schemas/integration-manifest.schema.json",
+    "example_integration_manifest": "examples/integration-manifest.example.json"
+  },
+  "local_runtime": {
+    "frontend": {
+      "entry": "src/main.tsx",
+      "routes": [
+        "src/routes/index.tsx",
+        "src/routes/chat.index.tsx",
+        "src/routes/chat.thread.tsx"
+      ],
+      "dev_url": "http://127.0.0.1:5173"
+    },
+    "server": {
+      "entry": "server/index.ts",
+      "health_endpoint": "http://127.0.0.1:8787/api/health",
+      "chat_endpoint": "http://127.0.0.1:8787/api/chat",
+      "env": [
+        "AI_PROVIDER",
+        "OPENAI_API_KEY",
+        "OPENAI_MODEL",
+        "DEEPSEEK_API_KEY",
+        "DEEPSEEK_BASE_URL",
+        "DEEPSEEK_MODEL",
+        "HOST",
+        "PORT"
+      ]
+    }
+  },
+  "confirmation_gate": {
+    "enabled": true,
+    "reference_implementation": "src/consequence-gate.ts",
+    "consequential_action_types": [
+      "spend_money",
+      "publish_external",
+      "deploy_production",
+      "delete_data",
+      "send_external",
+      "modify_billing",
+      "connect_paid_service"
+    ]
+  }
+}

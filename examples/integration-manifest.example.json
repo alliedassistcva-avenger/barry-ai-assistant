@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-07-03T12:00:00-04:00",
+  "integrations": [
+    {
+      "id": "codex_workspace",
+      "name": "Codex Workspace",
+      "category": "coding",
+      "status": "connected",
+      "description": "Read, edit, test, and debug code in the active workspace.",
+      "auth": {
+        "required": false,
+        "connected": true,
+        "connection_label": "local workspace",
+        "scopes": [
+          "workspace:read",
+          "workspace:write"
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "code_editing",
+          "description": "Modify files and run local validation commands within the workspace sandbox.",
+          "example_trigger_phrases": [
+            "fix this bug",
+            "add this feature",
+            "refactor this module"
+          ],
+          "requires_confirmation": false,
+          "consequential_actions": []
+        },
+        {
+          "id": "production_deploy",
+          "description": "Deploy code to a production target when a deployment integration is configured.",
+          "example_trigger_phrases": [
+            "deploy this",
+            "ship to production"
+          ],
+          "requires_confirmation": true,
+          "consequential_actions": [
+            "deploy_production"
+          ]
+        }
+      ],
+      "last_used_at": null,
+      "metadata": {
+        "sandbox": "workspace-write"
+      }
+    },
+    {
+      "id": "openai_image_generation",
+      "name": "OpenAI Image Generation",
+      "category": "image_generation",
+      "status": "connected",
+      "description": "Generate or edit raster images from prompts and uploaded references.",
+      "auth": {
+        "required": true,
+        "connected": true,
+        "connection_label": "workspace OpenAI account",
+        "scopes": [
+          "images:generate"
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "generate_image",
+          "description": "Create a new image from a natural-language description.",
+          "example_trigger_phrases": [
+            "generate an image",
+            "make a hero visual",
+            "create a product mockup"
+          ],
+          "requires_confirmation": false,
+          "consequential_actions": []
+        }
+      ],
+      "last_used_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "google_ads",
+      "name": "Google Ads",
+      "category": "ads",
+      "status": "disconnected",
+      "description": "Analyze and manage Google Ads campaigns, budgets, keywords, and ad copy.",
+      "auth": {
+        "required": true,
+        "connected": false,
+        "connection_label": null,
+        "scopes": [
+          "ads:read",
+          "ads:write"
+        ]
+      },
+      "capabilities": [
+        {
+          "id": "campaign_analysis",
+          "description": "Analyze live campaign performance when connected.",
+          "example_trigger_phrases": [
+            "analyze my Google Ads",
+            "show spend by campaign"
+          ],
+          "requires_confirmation": false,
+          "consequential_actions": []
+        },
+        {
+          "id": "publish_campaign_changes",
+          "description": "Publish campaign, keyword, budget, or ad copy changes.",
+          "example_trigger_phrases": [
+            "increase this budget",
+            "pause that campaign",
+            "publish these ads"
+          ],
+          "requires_confirmation": true,
+          "consequential_actions": [
+            "spend_money",
+            "publish_external"
+          ]
+        }
+      ],
+      "last_used_at": null,
+      "metadata": {
+        "example_only": true
+      }
+    }
+  ]
+}
+
